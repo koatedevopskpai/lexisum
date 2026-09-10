@@ -204,7 +204,9 @@ def run_abstractive_benchmark(
             existing = json.load(f)
         print(f"Resume mode: {len(existing)} existing records loaded")
 
-    all_records: List[Dict[str, Any]] = []
+    # Preserve records for models that are NOT part of this run, then replace
+    # (or add) the records for the models being run.
+    all_records: List[Dict[str, Any]] = [r for r in existing if r["model"] not in models]
     for model in models:
         old_recs = [r for r in existing if r["model"] == model]
         done_ids = {r["contract_id"] for r in old_recs if not r["error"]}
