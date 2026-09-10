@@ -1,0 +1,15 @@
+services:
+  lexisum:
+    build: .
+    image: lexisum:latest
+    container_name: lexisum
+    ports:
+      - "8501:8501"
+    env_file:
+      - .env
+    environment:
+      - STREAMLIT_SERVER_HEADLESS=true
+      - USAGE_LOG_PATH=/app/logs/usage.log
+    volumes:
+      - ./logs:/app/logs
+    restart: unless-stopped
