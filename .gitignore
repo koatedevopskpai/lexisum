@@ -28,7 +28,6 @@ htmlcov/
 # Data & logs
 logs/
 benchmark/results/
-*.gif
 data/
 
 # OS
