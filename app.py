@@ -21,7 +21,7 @@ import streamlit as st
 
 from src.config import settings
 from src.cost.cost_tracker import CostTracker
-from src.cost.pricing import PRICING_PER_MILLION
+from src.cost.pricing import PRICING_PER_MILLION, compute_cost
 from src.export.document_generator import DocumentExportEngine
 from src.ingestion.local_files import load_pdf, load_text_file
 from src.pipeline import LegalSummarizationPipeline
@@ -170,11 +170,8 @@ if uploaded_files:
 
                 # Usage summary (FinOps actuals)
                 if usage:
-                    cost = CostTracker.estimate_cost(model_choice, raw_text, output_estimate_tokens=0)
-                    # Recompute actual cost from actual tokens
-                    actual_cost = (
-                        (usage["input_tokens"] / 1_000_000) * PRICING_PER_MILLION.get(model_choice, {}).get("input", 0)
-                        + (usage["output_tokens"] / 1_000_000) * PRICING_PER_MILLION.get(model_choice, {}).get("output", 0)
+                    actual_cost = compute_cost(
+                        model_choice, usage["input_tokens"], usage["output_tokens"]
                     )
                     st.caption(
                         f"Strategy: `{usage['strategy']}` · LLM calls: {usage['calls']} · "
