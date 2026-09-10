@@ -14,10 +14,16 @@ from __future__ import annotations
 
 import argparse
 import json
+import logging
 import os
 import random
 import statistics
+import time
 from typing import Any, Dict, List
+
+from dotenv import load_dotenv
+
+load_dotenv()
 
 import pandas as pd
 from tabulate import tabulate
@@ -50,7 +56,7 @@ def judge_single(
     summary: str,
     source: str,
     model: str = JUDGE_MODEL,
-    max_retries: int = 3,
+    max_retries: int = 5,
     timeout: int = 120,
 ) -> Dict[str, Any]:
     """Call the judge LLM and return parsed JSON scores."""
@@ -71,7 +77,8 @@ def judge_single(
         )
         parsed = json.loads(resp.choices[0].message.content.strip())
         return {k: parsed.get(k, 0) for k in RUBRIC_DIMENSIONS}
-    except Exception:
+    except Exception as exc:  # pragma: no cover - network/provider errors
+        logging.warning("Judge call failed (%s): %s", model, str(exc)[:200])
         return {k: 0 for k in RUBRIC_DIMENSIONS}
 
 
@@ -81,6 +88,7 @@ def run_rubric_evaluation(
     judge_sample_size: int = 15,
     seed: int = 42,
     judge_model: str = JUDGE_MODEL,
+    judge_delay: float = 0.5,
 ) -> Dict[str, Dict[str, float]]:
     random.seed(seed)
     contract_map = {c["contract_id"]: c for c in contracts}
@@ -96,13 +104,15 @@ def run_rubric_evaluation(
         print(f"\nJudging {model} on {min(judge_sample_size, len(recs))} samples...")
         sample = random.sample(recs, min(judge_sample_size, len(recs)))
         per_dim: Dict[str, List[int]] = {d: [] for d in RUBRIC_DIMENSIONS}
-        for r in sample:
+        for i, r in enumerate(sample):
             contract = contract_map.get(r["contract_id"])
             if not contract:
                 continue
             scores = judge_single(r["summary"], contract["contract_text"], model=judge_model)
             for d in RUBRIC_DIMENSIONS:
                 per_dim[d].append(scores[d])
+            if i < len(sample) - 1 and judge_delay > 0:
+                time.sleep(judge_delay)
 
         results[model] = {
             d: round(statistics.mean(vals), 2) if vals else 0.0

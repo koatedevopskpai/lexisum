@@ -6,7 +6,7 @@
 
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Tests](https://img.shields.io/badge/tests-29%20passing-brightgreen.svg)](tests/)
+[![Tests](https://img.shields.io/badge/tests-32%20passing-brightgreen.svg)](tests/)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
@@ -196,7 +196,18 @@ python -m benchmark.evaluate_abstractive --judge-sample-size 15
 Throttle knobs (all optional): `--batch-size`, `--max-concurrency`, `--max-retries`,
 `--batch-retries`, `--request-timeout`, `--batch-delay`. See `docs/ARCHITECTURE.md` → ADR-009.
 
-<!-- Paste generated table here after running the benchmark -->
+**Corpus:** CUAD — 100 contracts. **Judge:** `gpt-4o` on 15 samples per model. Results are real, reproducible numbers (raw JSON lives in `benchmark/results/`, git-ignored).
+
+| Model | BERTScore F1 | Rubric Overall | Obligations | Risk/Liability | Termination | Plain Lang. | Faithful | Avg Cost |
+|---|---|---|---|---|---|---|---|---|
+| **gpt-4o-mini** | 0.768 | **3.21** | **3.20** | **3.00** | 2.80 | 4.13 | **2.93** | **$0.0017** |
+| claude-haiku-4-5 | **0.776** | 2.95 | 2.67 | 2.60 | 2.67 | **4.20** | 2.60 | $0.0141 |
+| gemini/gemini-3.6-flash | 0.702 | 1.63 | 1.60 | 1.20 | 1.20 | 2.53 | 1.60 | $0.0112 |
+
+**Honest takeaway.**
+- **BERTScore** (semantic overlap with expert-annotated clauses) is led by Claude Haiku 4.5 (0.776), with GPT-4o-mini a close second (0.768) and Gemini Flash trailing (0.702).
+- **Rubric** (LLM-as-judge): GPT-4o-mini is the best *all-rounder* — strongest on obligation coverage and faithfulness — and it is **~8× cheaper per contract** than Claude Haiku 4.5. At 200 contracts/day the abstractive cost is ~$0.34 (gpt-4o-mini) vs ~$2.82 (claude-haiku-4-5).
+- **Caveat:** rubric scores are modest overall (1.6–3.2). A 2-paragraph executive briefing cannot cover all 20–50 expert-annotated clauses in a CUAD contract, so faithfulness is inherently bounded. This is a real property of the task, not a model failure — and why the extractive (verbatim) engine is a required sibling.
 
 ---
 

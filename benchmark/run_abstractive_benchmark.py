@@ -32,10 +32,13 @@ import os
 import time
 from typing import Any, Dict, Iterable, List
 
+from dotenv import load_dotenv
 from litellm import batch_completion
 
 from benchmark.download_data import download_cuad, save_local
 from src.cost.pricing import PRICING_PER_MILLION, compute_cost
+
+load_dotenv()
 
 MODELS = ["gpt-4o-mini", "claude-haiku-4-5", "gemini/gemini-3.6-flash"]
 
