@@ -21,9 +21,7 @@ PRICING_PER_MILLION: Dict[str, Dict[str, float]] = {
     "o3-mini": {"input": 1.10, "output": 4.40, "context": 200_000},
     "claude-haiku-4-5": {"input": 1.00, "output": 5.00, "context": 200_000},
     "claude-sonnet-4-5": {"input": 3.00, "output": 15.00, "context": 200_000},
-    "gemini/gemini-2.0-flash": {"input": 0.10, "output": 0.40, "context": 1_048_576},
-    "gemini/gemini-2.5-flash": {"input": 0.30, "output": 2.50, "context": 1_048_576},
-    "gemini-2.5-pro": {"input": 1.25, "output": 10.00, "context": 1_048_576},
+    "gemini/gemini-3.6-flash": {"input": 0.75, "output": 3.75, "context": 1_048_576},
 }
 
 # Fallback for unknown models (keeps estimation non-fatal).

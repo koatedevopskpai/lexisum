@@ -30,9 +30,7 @@ MODEL_CONTEXT_LIMITS: Dict[str, int] = {
     "o3-mini": 200_000,
     "claude-sonnet-4-5": 200_000,
     "claude-haiku-4-5": 200_000,
-    "gemini/gemini-2.0-flash": 1_048_576,
-    "gemini/gemini-2.5-flash": 1_048_576,
-    "gemini-2.5-pro": 1_048_576,
+    "gemini/gemini-3.6-flash": 1_048_576,
 }
 
 

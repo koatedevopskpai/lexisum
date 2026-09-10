@@ -80,6 +80,7 @@ def run_rubric_evaluation(
     contracts: List[Dict],
     judge_sample_size: int = 15,
     seed: int = 42,
+    judge_model: str = JUDGE_MODEL,
 ) -> Dict[str, Dict[str, float]]:
     random.seed(seed)
     contract_map = {c["contract_id"]: c for c in contracts}
@@ -99,7 +100,7 @@ def run_rubric_evaluation(
             contract = contract_map.get(r["contract_id"])
             if not contract:
                 continue
-            scores = judge_single(r["summary"], contract["contract_text"])
+            scores = judge_single(r["summary"], contract["contract_text"], model=judge_model)
             for d in RUBRIC_DIMENSIONS:
                 per_dim[d].append(scores[d])
 
@@ -113,7 +114,11 @@ def run_rubric_evaluation(
     return results
 
 
-def evaluate(output_dir: str = "benchmark/results", judge_sample_size: int = 15) -> pd.DataFrame:
+def evaluate(
+    output_dir: str = "benchmark/results",
+    judge_sample_size: int = 15,
+    judge_model: str = JUDGE_MODEL,
+) -> pd.DataFrame:
     with open(os.path.join(output_dir, "abstractive_results.json"), encoding="utf-8") as f:
         records = json.load(f)
     with open(os.path.join(output_dir, "cuad_sample.json"), encoding="utf-8") as f:
@@ -131,7 +136,9 @@ def evaluate(output_dir: str = "benchmark/results", judge_sample_size: int = 15)
         bert_results[model] = compute_bertscore(preds, refs)
         print(f"  {model}: F1 = {bert_results[model]['bertscore_f1']}")
 
-    rubric_results = run_rubric_evaluation(valid, contracts, judge_sample_size=judge_sample_size)
+    rubric_results = run_rubric_evaluation(
+        valid, contracts, judge_sample_size=judge_sample_size, judge_model=judge_model
+    )
 
     cost_results = {}
     for model in sorted({r["model"] for r in valid}):
@@ -194,5 +201,6 @@ if __name__ == "__main__":
     p = argparse.ArgumentParser()
     p.add_argument("--output-dir", type=str, default="benchmark/results")
     p.add_argument("--judge-sample-size", type=int, default=15)
+    p.add_argument("--judge-model", type=str, default=JUDGE_MODEL)
     args = p.parse_args()
-    evaluate(args.output_dir, args.judge_sample_size)
+    evaluate(args.output_dir, args.judge_sample_size, args.judge_model)

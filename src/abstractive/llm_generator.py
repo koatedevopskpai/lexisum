@@ -35,9 +35,7 @@ DEFAULT_PRICE_PER_MILLION = {
     "o3-mini": {"input": 1.10, "output": 4.40},
     "claude-haiku-4-5": {"input": 1.00, "output": 5.00},
     "claude-sonnet-4-5": {"input": 3.00, "output": 15.00},
-    "gemini/gemini-2.0-flash": {"input": 0.10, "output": 0.40},
-    "gemini/gemini-2.5-flash": {"input": 0.30, "output": 2.50},
-    "gemini-2.5-pro": {"input": 1.25, "output": 10.00},
+    "gemini/gemini-3.6-flash": {"input": 0.75, "output": 3.75},
 }
 
 # A leaner default for models without a known mapping (USD per 1M tokens).

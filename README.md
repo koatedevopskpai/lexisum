@@ -149,9 +149,9 @@ Example estimate (25-page contract, ~30k input tokens):
 | Model | Estimated Cost |
 |---|---|
 | gpt-4o-mini | ~$0.005 |
-| gemini/gemini-2.0-flash | ~$0.005 |
+| gemini/gemini-3.6-flash | ~$0.03 |
 | claude-haiku-4-5 | ~$0.03 |
-| gpt-4o | ~$0.16 |
+| gpt-4o | ~$0.08 |
 
 ---
 
@@ -182,7 +182,7 @@ python -m benchmark.reproduce_all    # full suite
 
 ### Abstractive: multi-model comparison
 
-Compares `gpt-4o-mini`, `claude-haiku-4-5`, and `gemini/gemini-2.0-flash` using **BERTScore** and a **5-dimension LLM-as-judge rubric** (obligations, risk/liability, termination, plain language, faithfulness) plus per-contract cost.
+Compares `gpt-4o-mini`, `claude-haiku-4-5`, and `gemini/gemini-3.6-flash` using **BERTScore** and a **5-dimension LLM-as-judge rubric** (obligations, risk/liability, termination, plain language, faithfulness) plus per-contract cost.
 
 ```bash
 # Generate summaries (rate-limit-safe by default: batch_size=10, concurrency=4,

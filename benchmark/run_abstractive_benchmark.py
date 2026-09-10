@@ -19,9 +19,9 @@ This runner therefore:
   - pauses between batches (`--batch-delay`) to smooth RPM.
 
 Models compared by default (current, comparable fast/cheap tier):
-  - gpt-4o-mini            (OpenAI)
-  - claude-haiku-4-5       (Anthropic)
-  - gemini/gemini-2.0-flash (Google)
+  - gpt-4o-mini             (OpenAI)
+  - claude-haiku-4-5        (Anthropic)
+  - gemini/gemini-3.6-flash (Google)
 """
 
 from __future__ import annotations
@@ -37,7 +37,7 @@ from litellm import batch_completion
 from benchmark.download_data import download_cuad, save_local
 from src.cost.pricing import PRICING_PER_MILLION, compute_cost
 
-MODELS = ["gpt-4o-mini", "claude-haiku-4-5", "gemini/gemini-2.0-flash"]
+MODELS = ["gpt-4o-mini", "claude-haiku-4-5", "gemini/gemini-3.6-flash"]
 
 PROMPT_TEMPLATE = """You are an expert legal counsel assisting non-legal stakeholders.
 Read the following contract and produce a clear, plain-language business summary.
@@ -189,6 +189,7 @@ def run_abstractive_benchmark(
     if os.path.exists(data_path):
         with open(data_path, encoding="utf-8") as f:
             data = json.load(f)
+        data = data[:sample_size]
         print(f"Loaded cached sample: {len(data)} contracts")
     else:
         data = download_cuad(sample_size=sample_size)
