@@ -20,7 +20,9 @@ class DocumentParser:
 
     def __init__(self, model_name: str = "en_core_web_sm") -> None:
         try:
-            self.nlp = spacy.load(model_name, disable=["ner", "tagger", "parser"])
+            self.nlp = spacy.load(
+                model_name, disable=["ner", "tagger", "parser", "lemmatizer", "attribute_ruler"]
+            )
             if "sentencizer" not in self.nlp.pipe_names:
                 self.nlp.add_pipe("sentencizer")
         except OSError:

@@ -40,7 +40,7 @@ class VerbatimAuditor:
 
     def __init__(self, model_name: str = "en_core_web_sm") -> None:
         try:
-            self.nlp = spacy.load(model_name, disable=["tagger", "parser", "ner"])
+            self.nlp = spacy.load(model_name, disable=["tagger", "parser", "ner", "lemmatizer"])
         except OSError:
             self.nlp = English()
         self.nlp.max_length = 3_000_000
