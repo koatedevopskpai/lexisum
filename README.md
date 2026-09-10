@@ -166,9 +166,19 @@ python -m benchmark.reproduce        # extractive only
 python -m benchmark.reproduce_all    # full suite
 ```
 
-Metrics: ROUGE-1/2/L F1, latency, and verbatim compliance. Results are auto-written to `benchmark/results/BENCHMARK.md`.
+**Corpus:** CUAD — 100 commercial legal contracts (sampled from 389 valid).
+**Task:** rank sentences by the likelihood they contain an expert-annotated clause.
+**Metrics:** MAP and nDCG@10 (ranking quality), precision/recall at top-N, ROUGE-L, latency, and verbatim pass rate.
 
-<!-- Paste generated table here after running the benchmark -->
+| Method | MAP | nDCG@10 | Precision@3 | Recall@3 | ROUGE-L | Latency (s) | Verbatim |
+|---|---|---|---|---|---|---|---|
+| TF-IDF + TextRank | 0.727 | **0.855** | **0.883** | 0.050 | **0.1748** | **0.005** | 100% |
+| Sentence-BERT + TextRank | **0.735** | 0.824 | 0.873 | 0.049 | 0.1482 | 1.501 | 100% |
+| Oracle (Gold Sentences) | 1.000 | 1.000 | 1.000 | 0.059 | 0.1222 | 0.000 | 100% |
+
+**Honest takeaway.** The general-purpose `all-MiniLM-L6-v2` embeddings did **not** meaningfully outperform the lexical TF-IDF baseline on CUAD clause selection (MAP 0.735 vs 0.727) and are ~300× slower. This is a useful negative result: legal clauses are highly formulaic, so lexical overlap is a strong signal, and a *general* sentence encoder adds little. The next experiment is a **legal-domain encoder** (e.g. Legal-BERT / Contract-BERT) or a query-relevance objective. Both engines maintain **100% verbatim compliance**; the Oracle is the ranking upper bound.
+
+> The original design brief assumed SBERT would win by ~13%. Benchmarking disproved that assumption — which is exactly why the benchmark exists.
 
 ### Abstractive: multi-model comparison
 

@@ -24,20 +24,33 @@ independent engines and an evaluation harness on a public corpus.
 
 **Evaluation (CUAD — 510 contracts, 13k expert annotations)**
 
-- Extractive: ROUGE-1/2/L F1, latency, verbatim pass rate, with an Oracle
-  upper bound from the gold clauses.
+- Extractive: MAP and nDCG@10 (ranking quality), precision/recall@N, ROUGE-L,
+  latency, and verbatim pass rate, with an Oracle upper bound from the gold
+  clauses.
 - Abstractive: BERTScore (`distilbert-base-uncased`) + a 5-dimension
   LLM-as-judge rubric (obligation coverage, risk/liability, termination
   clarity, plain language, faithfulness), plus cost per contract.
+
+**Surprising (negative) result**
+
+I expected Sentence-BERT to clearly beat the TF-IDF TextRank baseline. On 100
+CUAD contracts it didn't: MAP 0.735 vs 0.727 (essentially tied), and the
+lexical baseline is ~300× faster. My reading is that legal clauses are highly
+formulaic, so lexical overlap is already a strong signal, and a *general*
+encoder (`all-MiniLM-L6-v2`) adds little. I also tried ranking by similarity to
+a fixed set of key legal concepts (a query-relevance objective) and saw the
+same parity.
 
 Everything is reproducible: `python -m benchmark.reproduce_all`. Results are
 written to Markdown tables for direct inclusion in the README.
 
 **What I'd like feedback on**
 
+- Would a **legal-domain encoder** (Legal-BERT / Contract-BERT) change the
+  outcome, or is the ceiling set by the retrieval objective rather than the
+  embeddings?
 - Is the LLM-as-judge rubric reasonable for legal faithfulness, or should I
   move to human adjudication on a small sample?
-- Chunk overlap is a fixed 10%; would a learned/dynamic overlap help?
 - Any standard legal-summarisation baselines I'm missing (e.g. LexSumm, LexT5)?
 
 Repo + numbers: <REPO_URL>
