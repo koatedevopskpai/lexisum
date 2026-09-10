@@ -195,12 +195,28 @@ def run_abstractive_benchmark(
         data = download_cuad(sample_size=sample_size)
         save_local(data, data_path)
 
+    # Resumable: load any existing results so a partial/failed run can be
+    # continued without re-paying for contracts that already succeeded.
+    out_path = os.path.join(output_dir, "abstractive_results.json")
+    existing: List[Dict[str, Any]] = []
+    if os.path.exists(out_path):
+        with open(out_path, encoding="utf-8") as f:
+            existing = json.load(f)
+        print(f"Resume mode: {len(existing)} existing records loaded")
+
     all_records: List[Dict[str, Any]] = []
     for model in models:
-        all_records.extend(
-            run_single_model_on_contracts(
+        old_recs = [r for r in existing if r["model"] == model]
+        done_ids = {r["contract_id"] for r in old_recs if not r["error"]}
+        todo = [c for c in data if c["contract_id"] not in done_ids]
+        if not todo:
+            print(f"  {model}: all contracts already complete - skipping")
+            merged = old_recs
+        else:
+            print(f"  {model}: {len(todo)} contracts to (re)run ({len(done_ids)} already done)")
+            new_recs = run_single_model_on_contracts(
                 model,
-                data,
+                todo,
                 batch_size=batch_size,
                 max_concurrency=max_concurrency,
                 max_retries=max_retries,
@@ -209,9 +225,9 @@ def run_abstractive_benchmark(
                 batch_delay=batch_delay,
                 max_tokens=max_tokens,
             )
-        )
+            merged = [r for r in old_recs if not r["error"]] + new_recs
+        all_records.extend(merged)
 
-    out_path = os.path.join(output_dir, "abstractive_results.json")
     with open(out_path, "w", encoding="utf-8") as f:
         json.dump(all_records, f, indent=2)
     print(f"\nSaved {len(all_records)} records to {out_path}")
