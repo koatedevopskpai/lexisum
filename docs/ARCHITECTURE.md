@@ -194,3 +194,32 @@ that yields structured events the UI renders progressively.
 - (+) Fast to build, one-command deploy to Streamlit Community Cloud.
 - (+) Native streaming and download buttons.
 - (−) Not suitable for high-scale multi-tenant production (documented as future work).
+
+---
+
+## ADR-009: Rate-limit-aware benchmark batching
+
+**Context.** The abstractive benchmark issues one request per contract across
+three providers. LiteLLM's `batch_completion` defaults to
+`ThreadPoolExecutor(max_workers=100)`, so a 100-contract run fires 100
+concurrent requests and reliably triggers 429 rate limits (Gemini's free tier
+is especially tight, ~15 RPM).
+
+**Decision.** Throttle generation with three levers, all configurable via CLI:
+- **Chunking** (`--batch-size`, default 10): contracts are processed in small
+  batches, giving progress visibility and bounding blast radius.
+- **Bounded concurrency** (`--max-concurrency`, default 4): passed as
+  `max_workers` to `batch_completion` so in-flight requests never spike.
+- **Retries with backoff** (`--max-retries` for LiteLLM per-request retries,
+  plus `--batch-retries` for whole-batch failures) and a `--batch-delay`
+  pause between batches.
+
+Judge calls in the evaluation phase get the same `num_retries`/`timeout`
+treatment.
+
+**Consequences.**
+- (+) Respects provider RPM quotas; failures are contained per batch and
+  logged as per-contract errors instead of aborting the run.
+- (+) Run parameters are recorded, so results are reproducible.
+- (−) Slower wall-clock than firing everything at once (acceptable: the
+  limiting factor is the provider quota, not the client).

@@ -46,7 +46,13 @@ def compute_bertscore(predictions: List[str], references: List[str]) -> Dict[str
     }
 
 
-def judge_single(summary: str, source: str, model: str = JUDGE_MODEL) -> Dict[str, Any]:
+def judge_single(
+    summary: str,
+    source: str,
+    model: str = JUDGE_MODEL,
+    max_retries: int = 3,
+    timeout: int = 120,
+) -> Dict[str, Any]:
     """Call the judge LLM and return parsed JSON scores."""
     from litellm import completion
 
@@ -60,6 +66,8 @@ def judge_single(summary: str, source: str, model: str = JUDGE_MODEL) -> Dict[st
             ],
             temperature=0.0,
             response_format={"type": "json_object"},
+            num_retries=max_retries,
+            timeout=timeout,
         )
         parsed = json.loads(resp.choices[0].message.content.strip())
         return {k: parsed.get(k, 0) for k in RUBRIC_DIMENSIONS}

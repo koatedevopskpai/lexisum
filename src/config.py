@@ -26,12 +26,13 @@ MODEL_CONTEXT_LIMITS: Dict[str, int] = {
     "gpt-4o": 128_000,
     "gpt-4o-mini": 128_000,
     "gpt-4-turbo": 128_000,
-    "claude-3-5-sonnet": 200_000,
-    "claude-3-5-haiku": 200_000,
-    "claude-3-haiku": 200_000,
-    "gemini-1.5-pro": 2_000_000,
-    "gemini-1.5-flash": 1_000_000,
-    "gemini-2.0-flash": 1_000_000,
+    "gpt-4.1": 1_047_576,
+    "o3-mini": 200_000,
+    "claude-sonnet-4-5": 200_000,
+    "claude-haiku-4-5": 200_000,
+    "gemini/gemini-2.0-flash": 1_048_576,
+    "gemini/gemini-2.5-flash": 1_048_576,
+    "gemini-2.5-pro": 1_048_576,
 }
 
 
