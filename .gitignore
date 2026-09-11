@@ -36,3 +36,13 @@ Thumbs.db
 
 # Local design transcript (not part of the project)
 Project-portfolio2.txt
+
+# Word / Office lock & temp files
+~$*
+*.tmp
+
+# Streamlit secrets (local) - use the Cloud secrets manager instead
+.streamlit/secrets.toml
+
+# Local-only deployment runbook (never push account details)
+docs/DEPLOYMENT.md

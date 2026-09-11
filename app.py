@@ -28,6 +28,35 @@ from src.pipeline import LegalSummarizationPipeline
 
 MODELS = sorted(PRICING_PER_MILLION.keys())
 
+
+def _load_streamlit_secrets() -> None:
+    """
+    Populate provider keys from Streamlit secrets so a deployed app works
+    out of the box. Local `.env` values always win (setdefault), and the
+    session-only API key field in the sidebar overrides both.
+    """
+    try:
+        secrets = dict(st.secrets)
+    except Exception:
+        return
+    for key in ("OPENAI_API_KEY", "ANTHROPIC_API_KEY", "GEMINI_API_KEY"):
+        value = secrets.get(key)
+        if value:
+            os.environ.setdefault(key, str(value))
+
+
+_load_streamlit_secrets()
+
+
+def _provider_env_var(model: str) -> str:
+    """Return the env var that holds the API key for a model's provider."""
+    if model.startswith("claude"):
+        return "ANTHROPIC_API_KEY"
+    if "gemini" in model:
+        return "GEMINI_API_KEY"
+    return "OPENAI_API_KEY"
+
+
 st.set_page_config(
     page_title="LexiSum | Compliance-Safe Legal Summarizer",
     page_icon="⚖️",
@@ -67,10 +96,13 @@ with st.sidebar:
     num_sentences = st.slider("Extractive Sentences", 1, 5, settings.extractive_top_n)
     output_filename = st.text_input("Report Filename", value="Contract_Executive_Briefing")
 
-    # Optional BYO-key (used on Streamlit Cloud where secrets aren't available)
+    # BYO-key (Option A): visitors paste their own provider key. It is never
+    # stored and is billed to the visitor, not the app owner. The env var is
+    # chosen to match the selected model's provider.
     api_key = st.text_input("API Key (session only)", type="password")
     if api_key:
-        os.environ["OPENAI_API_KEY"] = api_key
+        os.environ[_provider_env_var(model_choice)] = api_key
+    st.caption("Bring your own key - billed to your account, never stored.")
 
     st.markdown("---")
     ctx = PRICING_PER_MILLION.get(model_choice, {}).get("context", "unknown")
