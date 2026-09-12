@@ -46,3 +46,6 @@ Project-portfolio2.txt
 
 # Local-only deployment runbook (never push account details)
 docs/DEPLOYMENT.md
+
+# Personal CV / cover letters (never push)
+cv/

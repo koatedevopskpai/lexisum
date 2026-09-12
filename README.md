@@ -2,7 +2,8 @@
 
 # ⚖️ LexiSum
 
-**Compliance-safe verbatim clause extraction + plain-language executive briefings — in one pipeline.**
+**The contract summarizer that never fabricates a clause.**
+Verbatim extractive clauses + plain-language LLM briefings — audited, streamed, and costed.
 
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
