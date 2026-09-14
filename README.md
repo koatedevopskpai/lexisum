@@ -36,7 +36,7 @@ Wrapping an LLM in a prompt is not enough: generative models paraphrase, halluci
 - 🔒 **100% Verbatim Extractive Summary** — algorithmically selected, audited, guaranteed unmodified.
 - 📝 **Plain-Language Abstractive Summary** — 2-paragraph executive briefing for non-legal stakeholders.
 - 🧠 **Smart Context Strategy** — `auto` / `single_shot` / `chunked_recursive` handles contracts of any size without truncation.
-- ⚡ **Real-Time Streaming** — summaries render token-by-token in the UI.
+- ⚡ **Real-Time Streaming** — summarises render token-by-token in the UI.
 - 💰 **FinOps Cost Tracking** — pre-flight estimates + post-run actuals, tagged and logged to `logs/usage.log`.
 - ☁️ **Cloud-Agnostic** — OpenAI, Azure OpenAI, GCP Vertex, AWS Bedrock via [LiteLLM](https://github.com/BerriAI/litellm).
 - 📄 **DOCX & PDF Export** — professional, in-memory briefings, no temp files.
