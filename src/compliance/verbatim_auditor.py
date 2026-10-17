@@ -1,17 +1,8 @@
-"""
-Token-level verbatim auditor for compliance verification.
+"""Normalised source-text matching for extracted clauses.
 
-The extractive pipeline guarantees that selected clauses are unmodified
-substrings of the source contract. This auditor verifies that guarantee
-with robust, token-based matching that is tolerant of:
-
-  - punctuation / curly-quote differences
-  - whitespace and newline variations
-  - control characters
-
-It falls back from an exact normalised-substring check to a contiguous
-token-subsequence check, avoiding the false negatives that a naive
-`in` substring test produces on real-world legal documents.
+First checks a normalised substring, then a contiguous token subsequence with
+punctuation/space tokens omitted. A pass is not byte identity, clause relevance,
+legal correctness or generated-summary faithfulness. See docs/AUDITOR_SEMANTICS.md.
 """
 
 from __future__ import annotations
@@ -36,7 +27,7 @@ _QUOTE_MAP = {
 
 
 class VerbatimAuditor:
-    """Verify that extracted sentences appear verbatim within source text."""
+    """Check extracted text against the documented normalised matching rules."""
 
     def __init__(self, model_name: str = "en_core_web_sm") -> None:
         try:
@@ -62,8 +53,8 @@ class VerbatimAuditor:
 
     def is_verbatim(self, sentence: str, source: str) -> bool:
         """
-        True if `sentence` appears verbatim in `source`, tolerant of
-        punctuation/whitespace differences.
+        True if `sentence` passes normalised substring or token matching.
+        This is not a byte-exact or semantic equivalence check.
 
         First tries an exact normalised substring match; if that fails,
         checks that the sentence's tokens form a contiguous subsequence
@@ -110,8 +101,8 @@ class VerbatimAuditor:
     def audit_abstractive(self, summary_text: str) -> Dict[str, bool]:
         """
         Lightweight structural audit for abstractive output:
-        verifies the summary is non-empty and reasonably structured
-        (contains at least two paragraph breaks).
+        checks for at least one non-empty block and more than 50 characters.
+        It does not require two paragraph breaks or assess factual support.
         """
         blocks = [b for b in re.split(r"\n\s*\n", summary_text) if b.strip()]
         passed = len(blocks) >= 1 and len(summary_text) > 50

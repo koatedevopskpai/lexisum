@@ -3,10 +3,10 @@
 LexiSum is a **dual-engine** contract summarisation system. It deliberately
 separates the two summarisation paradigms that legal work demands:
 
-| Engine | Goal | Guarantee |
+| Engine | Goal | Implemented check / limitation |
 |---|---|---|
-| **Extractive** | Surface the *exact* critical clauses | 100% verbatim, no hallucination |
-| **Abstractive** | Explain obligations/risks in plain language | Faithful, readable, auditable |
+| **Extractive** | Select source clauses | Normalised substring / contiguous non-punctuation token match; not clause relevance |
+| **Abstractive** | Explain obligations/risks in plain language | Length/paragraph structure only; no semantic faithfulness guarantee |
 
 A **compliance auditor** sits across both outputs, and a **FinOps tracker**
 records the true cost of every LLM call.
@@ -80,7 +80,8 @@ extractive engine selects verbatim clauses algorithmically; the abstractive
 engine produces a plain-language briefing.
 
 **Consequences.**
-- (+) Compliance teams get unmodified clause text; executives get readable prose.
+- (+) Reviewers get extracted source candidates and a separate generated briefing.
+- Limitation: the auditor accepts some formatting differences and does not validate legal conclusions.
 - (+) Failure of one engine does not corrupt the other.
 - (−) Two code paths to maintain and test.
 
@@ -97,8 +98,9 @@ exact normalised-substring match, falling back to a **contiguous
 token-subsequence** match.
 
 **Consequences.**
-- (+) Robust to real-world formatting noise; no false compliance failures.
-- (+) Still strict — fabricated content is correctly rejected.
+- (+) Tolerates specified formatting differences, reducing some false negatives.
+- Limitation: accepts matching substrings/token runs, including incomplete or irrelevant source selections; this does not prove absence of semantic errors.
+- See [auditor semantics](AUDITOR_SEMANTICS.md) for exact boundaries and examples.
 - (−) Slightly more CPU per sentence (negligible).
 
 ---
