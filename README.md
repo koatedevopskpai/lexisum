@@ -126,10 +126,15 @@ python main.py --input-dir ./contracts --output-dir ./summaries --concurrency 5
 ## 🧪 Tests
 
 ```bash
-pytest tests/ -v
+# Small no-network core check, no provider or model download
+python -m pip install -r requirements-offline.lock
+python -m pytest -c pytest-offline.ini
+
+# Full existing suite (separate dependencies and integration assumptions)
+# pytest tests/ -v
 ```
 
-Covers: token-level verbatim auditing, extractive ranking, chunking strategy, pipeline integration, FinOps cost logging, and DOCX/PDF export.
+The offline-core profile covers extraction, source matching, basic export formats and usage accounting. It does not reproduce the benchmark or validate generated-summary faithfulness. See [L05 design and limits](docs/L05.md).
 
 ---
 
