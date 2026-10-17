@@ -49,3 +49,9 @@ docs/DEPLOYMENT.md
 
 # Personal CV / cover letters (never push)
 cv/
+# Generated CI/run output
+artifacts/
+offline-results.xml
+
+# Generated run output, uploaded by CI
+artifacts/
