@@ -2,12 +2,14 @@
 
 # ⚖️ LexiSum
 
+[Evidence index: measured results, reproduction and limits](EVIDENCE.md)
+
 **Contract extraction with source-text matching and generated executive briefings.**
 Verbatim extractive clauses + plain-language LLM briefings — audited, streamed, and costed.
 
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Tests](https://img.shields.io/badge/tests-32%20passing-brightgreen.svg)](tests/)
+[![Offline core](https://img.shields.io/badge/offline%20core-27%20checks-blue.svg)](docs/L05.md)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
@@ -35,14 +37,14 @@ Generative models can paraphrase or introduce unsupported claims. LexiSum separa
 
 - 🔒 **Source-matched extraction** — algorithmic selection checked with normalised substring/token matching; not a byte-exact or semantic guarantee.
 - 📝 **Plain-Language Abstractive Summary** — 2-paragraph executive briefing for non-legal stakeholders.
-- 🧠 **Smart Context Strategy** — `auto` / `single_shot` / `chunked_recursive` handles contracts of any size without truncation.
+- 🧠 **Smart Context Strategy** — `auto` / `single_shot` / `chunked_recursive` selects configured summarisation strategies; provider/context limits need workload-specific verification.
 - ⚡ **Real-Time Streaming** — summarises render token-by-token in the UI.
 - 💰 **FinOps Cost Tracking** — pre-flight estimates + post-run actuals, tagged and logged to `logs/usage.log`.
 - ☁️ **Cloud-Agnostic** — OpenAI, Azure OpenAI, GCP Vertex, AWS Bedrock via [LiteLLM](https://github.com/BerriAI/litellm).
 - 📄 **DOCX & PDF Export** — professional, in-memory briefings, no temp files.
 - 🐳 **Docker Ready** — one command to run the full stack.
-- 🧪 **Tested** — 29 unit tests covering the auditor, extractors, pipeline, cost tracker, and export engine.
-- 📊 **Benchmarked** — reproducible evaluation on the public CUAD corpus.
+- 🧪 **Offline core** — 27 checks recorded in [L05](docs/L05.md); this selected profile is separate from the full suite.
+- 📊 **Published evaluation** — CUAD results have a documented reproduction path; L05 does not rerun or validate those historical results. See [evidence](EVIDENCE.md).
 
 ---
 

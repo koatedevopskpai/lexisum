@@ -34,5 +34,5 @@ model, with GPT-4o-mini's published overall score 3.21/5. Published generation
 costs are USD per contract. These runs have not been reproduced by L01.
 
 Intended use: executive triage. Legal conclusions and generated summaries require
-review. L02-L04 remain separate benchmark/semantic-evaluation tasks; L05 remains
-blocked until this semantics correction is merged through review.
+review. L02-L04 remain separate benchmark/semantic-evaluation tasks. The L05 practical
+offline core is now recorded in docs/L05.md; it does not reproduce the benchmark.
