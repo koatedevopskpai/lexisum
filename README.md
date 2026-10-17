@@ -2,7 +2,7 @@
 
 # ⚖️ LexiSum
 
-**The contract summarizer that never fabricates a clause.**
+**Contract extraction with source-text matching and generated executive briefings.**
 Verbatim extractive clauses + plain-language LLM briefings — audited, streamed, and costed.
 
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/)
@@ -25,15 +25,15 @@ Legal teams face a fundamental tension:
 - **Compliance** needs the *exact* legal wording of critical clauses — no paraphrasing, no hallucination.
 - **Executives** need a *plain-language* summary of obligations, risks, and termination conditions.
 
-Wrapping an LLM in a prompt is not enough: generative models paraphrase, hallucinate, and are not admissible for evidentiary review. LexiSum solves this with a **dual-engine architecture** and a **token-level verbatim auditor**.
+Generative models can paraphrase or introduce unsupported claims. LexiSum separates clause extraction from generated prose and applies a source-text auditor to extraction. The auditor does not establish legal correctness or evidentiary admissibility.
 
-> **Zero hallucination on extractive tasks. Human-grade plain language on abstractive tasks.**
+> **Intended use: executive triage. Legal conclusions and generated summaries require review.**
 
 ---
 
 ## ✨ Features
 
-- 🔒 **100% Verbatim Extractive Summary** — algorithmically selected, audited, guaranteed unmodified.
+- 🔒 **Source-matched extraction** — algorithmic selection checked with normalised substring/token matching; not a byte-exact or semantic guarantee.
 - 📝 **Plain-Language Abstractive Summary** — 2-paragraph executive briefing for non-legal stakeholders.
 - 🧠 **Smart Context Strategy** — `auto` / `single_shot` / `chunked_recursive` handles contracts of any size without truncation.
 - ⚡ **Real-Time Streaming** — summarises render token-by-token in the UI.
@@ -156,6 +156,15 @@ Example estimate (25-page contract, ~30k input tokens):
 
 ---
 
+## Auditor scope
+
+See [AUDITOR_SEMANTICS.md](docs/AUDITOR_SEMANTICS.md) for the matching algorithm,
+examples and interpretation. The legacy `is_verbatim` field means a pass under
+that algorithm, not byte identity. The abstractive audit checks non-empty output
+longer than 50 characters and counts paragraph blocks; it is not a faithfulness
+judge. Draft write-ups and generated publication assets must be reconciled with
+this scope before reuse; this correction does not verify their other claims.
+
 ## 📊 Benchmarks
 
 LexiSum ships a reproducible benchmark suite on the **CUAD (Contract Understanding Atticus Dataset)** — 510 commercial legal contracts with 13,000+ expert annotations across 41 clause types.
@@ -177,7 +186,7 @@ python -m benchmark.reproduce_all    # full suite
 | Sentence-BERT + TextRank | **0.735** | 0.824 | 0.873 | 0.049 | 0.1482 | 1.501 | 100% |
 | Oracle (Gold Sentences) | 1.000 | 1.000 | 1.000 | 0.059 | 0.1222 | 0.000 | 100% |
 
-**Honest takeaway.** The general-purpose `all-MiniLM-L6-v2` embeddings did **not** meaningfully outperform the lexical TF-IDF baseline on CUAD clause selection (MAP 0.735 vs 0.727) and are ~300× slower. This is a useful negative result: legal clauses are highly formulaic, so lexical overlap is a strong signal, and a *general* sentence encoder adds little. The next experiment is a **legal-domain encoder** (e.g. Legal-BERT / Contract-BERT) or a query-relevance objective. Both engines maintain **100% verbatim compliance**; the Oracle is the ranking upper bound.
+**Honest takeaway.** The general-purpose `all-MiniLM-L6-v2` embeddings did **not** meaningfully outperform the lexical TF-IDF baseline on CUAD clause selection (MAP 0.735 vs 0.727) and are ~300× slower. This is a useful negative result: legal clauses are highly formulaic, so lexical overlap is a strong signal, and a *general* sentence encoder adds little. The next experiment is a **legal-domain encoder** (e.g. Legal-BERT / Contract-BERT) or a query-relevance objective. Both engines had a **100% normalised source-text auditor pass rate in that evaluation**; this does not prove correct clause selection or faithful generated summaries. The Oracle is the ranking upper bound.
 
 > The original design brief assumed SBERT would win by ~13%. Benchmarking disproved that assumption — which is exactly why the benchmark exists.
 
@@ -197,7 +206,7 @@ python -m benchmark.evaluate_abstractive --judge-sample-size 15
 Throttle knobs (all optional): `--batch-size`, `--max-concurrency`, `--max-retries`,
 `--batch-retries`, `--request-timeout`, `--batch-delay`. See `docs/ARCHITECTURE.md` → ADR-009.
 
-**Corpus:** CUAD — 100 contracts. **Judge:** `gpt-4o` on 15 samples per model. Results are real, reproducible numbers (raw JSON lives in `benchmark/results/`, git-ignored).
+**Corpus:** CUAD — 100 contracts. **Judge:** `gpt-4o` on 15 samples per model, not 100 judged outputs per model. These are previously published results, not rerun for this correction. Raw JSON is described as living in `benchmark/results/` (git-ignored); the public snapshot does not independently reproduce those runs. Costs below are published USD per contract, not current quotes.
 
 | Model | BERTScore F1 | Rubric Overall | Obligations | Risk/Liability | Termination | Plain Lang. | Faithful | Avg Cost |
 |---|---|---|---|---|---|---|---|---|
@@ -208,7 +217,7 @@ Throttle knobs (all optional): `--batch-size`, `--max-concurrency`, `--max-retri
 **Honest takeaway.**
 - **BERTScore** (semantic overlap with expert-annotated clauses) is led by Claude Haiku 4.5 (0.776), with GPT-4o-mini a close second (0.768) and Gemini Flash trailing (0.702).
 - **Rubric** (LLM-as-judge): GPT-4o-mini is the best *all-rounder* — strongest on obligation coverage and faithfulness — and it is **~8× cheaper per contract** than Claude Haiku 4.5. At 200 contracts/day the abstractive cost is ~$0.34 (gpt-4o-mini) vs ~$2.82 (claude-haiku-4-5).
-- **Caveat:** rubric scores are modest overall (1.6–3.2). A 2-paragraph executive briefing cannot cover all 20–50 expert-annotated clauses in a CUAD contract, so faithfulness is inherently bounded. This is a real property of the task, not a model failure — and why the extractive (verbatim) engine is a required sibling.
+- **Caveat:** rubric scores are modest overall (1.6–3.2) and the judge sample is small. Limited coverage and factual faithfulness are different questions: brevity does not excuse an unsupported claim. Source matching of extracted clauses does not validate generated prose.
 
 ---
 
