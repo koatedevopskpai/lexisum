@@ -61,7 +61,7 @@ it's documented so nobody else pays it.
 
 ## The ask
 
-LexiSum is production-grade for a personal project, but it's far from done.
+LexiSum is a working personal reference project, but it's far from done.
 The roadmap in the repo's Discussions has real candidates:
 
 - **Fine-tuned Legal-BERT extractive engine**, benchmarked head-to-head
